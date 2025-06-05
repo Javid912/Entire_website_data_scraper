@@ -1,0 +1,68 @@
+{% extends 'base.html' %}
+{% block title %}Dashboard{% endblock %}
+{% block content %}
+<h1>Scraping Dashboard</h1>
+<form id="scrape-form" method="post" action="/api/scrape">
+    <div class="mb-3">
+        <label for="url" class="form-label">Start URL</label>
+        <input type="url" class="form-control" id="url" name="url" value="https://kijufi.de/" required>
+    </div>
+    <div class="mb-3">
+        <label class="form-label">Scope</label><br>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="scope" id="scope_page" value="page" checked>
+            <label class="form-check-label" for="scope_page">This page only</label>
+        </div>
+        <div class="form-check form-check-inline">
+            <input class="form-check-input" type="radio" name="scope" id="scope_site" value="site">
+            <label class="form-check-label" for="scope_site">Entire website</label>
+        </div>
+    </div>
+    <div class="mb-3">
+        <label for="format" class="form-label">Output Format</label>
+        <select class="form-select" id="format" name="format">
+            <option value="json" selected>JSON</option>
+            <option value="csv">CSV</option>
+        </select>
+    </div>
+    <button type="submit" class="btn btn-primary">Start Scraping</button>
+</form>
+<div id="status" class="my-3">
+    <p class="fw-bold">Status: <span id="scrape-status">{{ status if status else 'Idle' }}</span></p>
+    {% if duration %}
+        <p>Scrape duration: {{ duration }} seconds</p>
+    {% endif %}
+</div>
+{% if preview and preview|length > 0 %}
+<hr>
+<h3>Preview of Results</h3>
+<div class="table-responsive">
+<table class="table table-bordered table-sm">
+    <thead>
+        <tr>
+            <th>URL</th>
+            <th>Title</th>
+            <th>Content (truncated)</th>
+            <th>Emails</th>
+            <th>Links (count)</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for item in preview %}
+        <tr>
+            <td>{{ item.url }}</td>
+            <td>{{ item.title }}</td>
+            <td>{{ item.content[:100] ~ ('...' if item.content|length > 100 else '') }}</td>
+            <td>{{ item.emails|join(', ') }}</td>
+            <td>{{ item.links|length }}</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+</div>
+{% endif %}
+<hr>
+<h3>Download Results</h3>
+<a href="/download/json" class="btn btn-success">Download JSON</a>
+<a href="/download/csv" class="btn btn-info">Download CSV</a>
+{% endblock %} 

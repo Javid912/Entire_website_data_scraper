@@ -1,0 +1,11 @@
+scrapy
+scrapy-playwright
+flask
+flask-sqlalchemy
+requests
+beautifulsoup4
+pandas
+python-dotenv
+gunicorn
+playwright
+readability-lxml 

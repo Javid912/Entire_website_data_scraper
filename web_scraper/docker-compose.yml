@@ -1,0 +1,22 @@
+version: '3.8'
+services:
+  web:
+    build: .
+    command: python flask_app/app.py
+    ports:
+      - "5000:5000"
+    volumes:
+      - ./data/scraped_data:/app/data/scraped_data
+      - ./flask_app/templates:/app/flask_app/templates
+    environment:
+      - PYTHONUNBUFFERED=1
+      - FLASK_ENV=development
+    working_dir: /app
+  scrapy:
+    build: .
+    command: scrapy crawl kijufi_spider -s LOG_LEVEL=INFO
+    volumes:
+      - ./data/scraped_data:/app/data/scraped_data
+    working_dir: /app/scrapy_project
+    environment:
+      - PYTHONUNBUFFERED=1 
