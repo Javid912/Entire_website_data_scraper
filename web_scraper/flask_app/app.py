@@ -1,4 +1,5 @@
 import sys, os
+# Add parent directory to sys.path for imports
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
@@ -11,26 +12,31 @@ app = Flask(__name__)
 app.config.from_object(Config)
 db = SQLAlchemy(app)
 
-SCRAPED_JSON = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/scraped_data/kijufi_data.json'))
-SCRAPED_CSV = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/scraped_data/kijufi_data.csv'))
+# Paths to output data files
+SCRAPED_JSON = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/scraped_data/scraped_data.json'))
+SCRAPED_CSV = os.path.abspath(os.path.join(os.path.dirname(__file__), '../../data/scraped_data/scraped_data.csv'))
 
 @app.route('/')
 def dashboard():
+    """Render the main dashboard page."""
     return render_template('dashboard.html')
 
 @app.route('/results')
 def results():
+    """Render the results page (not used by default)."""
     return render_template('results.html')
 
 @app.route('/api/scrape', methods=['POST'])
 def api_scrape():
-    url = request.form.get('url', 'https://kijufi.de/')
+    """Trigger a scrape via Scrapy subprocess and show status/results preview."""
+    url = request.form.get('url', 'https://example.com/')
     scope = request.form.get('scope', 'site')
     out_format = request.form.get('format', 'json')
     scrapy_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '../scrapy_project'))
-    cmd = ['scrapy', 'crawl', 'kijufi_spider']
+    cmd = ['scrapy', 'crawl', 'main_spider']
     start_time = datetime.now()
     try:
+        # Run the Scrapy spider as a subprocess
         subprocess.run(cmd, cwd=scrapy_dir, check=True)
         status = 'Scraping completed.'
     except Exception as e:
@@ -39,6 +45,7 @@ def api_scrape():
     duration = (end_time - start_time).total_seconds()
     preview = []
     try:
+        # Load a preview of the results (first 3 items)
         with open(SCRAPED_JSON, 'r') as f:
             data = json.load(f)
             preview = data[:3] if isinstance(data, list) else []
@@ -48,6 +55,7 @@ def api_scrape():
 
 @app.route('/download/<format>')
 def download_data(format):
+    """Download the scraped data as JSON or CSV."""
     if format == 'json':
         if not os.path.exists(SCRAPED_JSON):
             return 'JSON result not found. Please run a scrape first.', 404
@@ -68,7 +76,9 @@ def download_data(format):
 
 @app.route('/api/status')
 def api_status():
+    """API endpoint for checking status (not used by default)."""
     return jsonify({'status': 'idle'})
 
 if __name__ == '__main__':
+    # Run the Flask app
     app.run(host="0.0.0.0", port=5000, debug=True) 

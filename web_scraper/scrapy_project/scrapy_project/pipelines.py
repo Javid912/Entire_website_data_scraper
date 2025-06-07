@@ -3,11 +3,13 @@ import os
 from scrapy.exceptions import DropItem
 
 class CleanDataPipeline:
+    """Pipeline for cleaning and normalizing scraped data."""
     def process_item(self, item, spider):
         # Implement data cleaning here
         return item
 
 class DuplicatesPipeline:
+    """Pipeline to filter out duplicate URLs."""
     def __init__(self):
         self.seen_urls = set()
 
@@ -18,10 +20,11 @@ class DuplicatesPipeline:
         return item
 
 class JsonExportPipeline:
+    """Pipeline to export items to a JSON file."""
     def open_spider(self, spider):
         output_dir = os.path.join(os.path.dirname(__file__), '../../data/scraped_data')
         os.makedirs(output_dir, exist_ok=True)
-        output_path = os.path.join(output_dir, 'kijufi_data.json')
+        output_path = os.path.join(output_dir, 'scraped_data.json')
         self.file = open(output_path, 'w', encoding='utf-8')
         self.first = True
         self.file.write('[')

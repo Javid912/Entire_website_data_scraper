@@ -1,6 +1,6 @@
 import scrapy
 from scrapy.http import Request
-from ..items import KijufiItem
+from ..items import ScrapedItem
 from datetime import datetime
 from urllib.parse import urljoin, urlparse
 import random
@@ -8,10 +8,10 @@ import re
 from readability import Document
 from bs4 import BeautifulSoup
 
-class KijufiSpider(scrapy.Spider):
-    name = 'kijufi_spider'
-    allowed_domains = ['kijufi.de']
-    start_urls = ['https://kijufi.de/']
+class MainSpider(scrapy.Spider):
+    name = 'main_spider'
+    allowed_domains = []  # Allow all domains by default
+    start_urls = []  # Will be set dynamically if needed
 
     custom_settings = {
         'PLAYWRIGHT_PAGE_METHODS': [
@@ -19,8 +19,19 @@ class KijufiSpider(scrapy.Spider):
         ]
     }
 
+    def start_requests(self):
+        # Allow passing start_urls via spider arguments
+        url = getattr(self, 'start_url', None)
+        if url:
+            # Start from the user-provided URL
+            yield scrapy.Request(url, callback=self.parse, meta={'playwright': True})
+        else:
+            # Start from default start_urls if provided
+            for url in self.start_urls:
+                yield scrapy.Request(url, callback=self.parse, meta={'playwright': True})
+
     def parse(self, response):
-        item = KijufiItem()
+        item = ScrapedItem()
         item['url'] = response.url
         item['title'] = response.xpath('//title/text()').get()
         # Use readability-lxml to extract main content
@@ -37,7 +48,7 @@ class KijufiSpider(scrapy.Spider):
         item['links'] = list(set([l for l in links if self.is_internal(l) or l.startswith('http')]))
         yield item
 
-        # Follow internal links
+        # Follow internal links (for full site crawl)
         for link in item['links']:
             if self.is_internal(link):
                 yield Request(
@@ -56,8 +67,10 @@ class KijufiSpider(scrapy.Spider):
                 )
 
     def is_internal(self, url):
+        # Consider all links as internal for generic use, or customize as needed
         parsed = urlparse(url)
-        return parsed.netloc.endswith('kijufi.de')
+        return True
 
     def errback(self, failure):
+        # Log failed requests
         self.logger.error(f"Request failed: {failure.request.url} - {failure.value}") 

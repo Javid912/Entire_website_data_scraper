@@ -1,6 +1,6 @@
-# KIJUFI Web Scraper & Dashboard
+# Entire Website Data Scraper & Dashboard
 
-A production-ready web scraping and dashboard solution for https://kijufi.de/ using Scrapy, Playwright, and Flask. Easily run and manage scrapes, view results, and download data in JSON or CSV format.
+A production-ready, Dockerized web scraping and dashboard solution for any website using Scrapy, Playwright, and Flask. Easily run and manage scrapes, view results, and download data in JSON or CSV format.
 
 ## Features
 - Scrape the entire website or a single page
@@ -19,11 +19,6 @@ A production-ready web scraping and dashboard solution for https://kijufi.de/ us
    docker-compose up web
    ```
    Visit [http://localhost:5000](http://localhost:5000)
-3. **Run a Scrapy crawl (optional, from CLI):**
-   ```bash
-   docker-compose run --rm scrapy
-   ```
-   Results are saved in `data/scraped_data/`.
 
 ## Development Setup (without Docker)
 
@@ -41,7 +36,7 @@ A production-ready web scraping and dashboard solution for https://kijufi.de/ us
 3. Run the Scrapy spider:
    ```bash
    cd scrapy_project
-   scrapy crawl kijufi_spider
+   scrapy crawl main_spider -a start_url=https://example.com/
    ```
 
 ## Environment Variables
@@ -51,6 +46,9 @@ Copy `.env.example` to `.env` and adjust as needed.
 - `flask_app/` - Flask dashboard
 - `scrapy_project/` - Scrapy spiders and pipelines
 - `data/scraped_data/` - Output data (ignored by git)
+
+## Contributing
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ## License
 MIT 
