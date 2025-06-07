@@ -1,0 +1,42 @@
+# Python
+venv/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.DS_Store
+
+# Environment files
+.env
+.env.*
+
+# Data/output
+web_scraper/data/
+!web_scraper/data/.gitkeep
+
+# Playwright browser cache
+/ms-playwright/
+
+# Jupyter and notebook checkpoints
+.ipynb_checkpoints/
+
+# VSCode and IDE files
+.vscode/
+.idea/
+
+# OS files
+Thumbs.db
+
+# Node/npm (if any)
+node_modules/
+
+# Coverage and test
+.coverage
+htmlcov/
+
+# Logs
+*.log
+
+# Misc
+*.bak
+*.swp 
