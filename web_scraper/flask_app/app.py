@@ -1,6 +1,6 @@
 import sys, os
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
-from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for
+from flask import Flask, render_template, jsonify, request, send_file, redirect, url_for, abort
 from flask_sqlalchemy import SQLAlchemy
 from config import Config
 import subprocess
@@ -49,10 +49,13 @@ def api_scrape():
 @app.route('/download/<format>')
 def download_data(format):
     if format == 'json':
+        if not os.path.exists(SCRAPED_JSON):
+            return 'JSON result not found. Please run a scrape first.', 404
         return send_file(SCRAPED_JSON, as_attachment=True)
     elif format == 'csv':
-        # Convert JSON to CSV on the fly if needed
         import pandas as pd
+        if not os.path.exists(SCRAPED_JSON):
+            return 'CSV result not found. Please run a scrape first.', 404
         if not os.path.exists(SCRAPED_CSV):
             try:
                 df = pd.read_json(SCRAPED_JSON)

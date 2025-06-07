@@ -11,12 +11,5 @@ services:
     environment:
       - PYTHONUNBUFFERED=1
       - FLASK_ENV=development
-    working_dir: /app
-  scrapy:
-    build: .
-    command: scrapy crawl kijufi_spider -s LOG_LEVEL=INFO
-    volumes:
-      - ./data/scraped_data:/app/data/scraped_data
-    working_dir: /app/scrapy_project
-    environment:
-      - PYTHONUNBUFFERED=1 
+      - PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+    working_dir: /app 

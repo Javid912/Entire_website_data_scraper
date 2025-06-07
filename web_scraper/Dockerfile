@@ -18,21 +18,23 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
 RUN useradd -ms /bin/bash appuser
 WORKDIR /app
 
+# Set a shared browser path for Playwright
+ENV PLAYWRIGHT_BROWSERS_PATH=/ms-playwright
+
 # Copy only requirements first for better caching
 COPY requirements.txt ./
 RUN pip install --no-cache-dir --upgrade pip && \
     pip install --no-cache-dir -r requirements.txt
 
-# Install Playwright and browsers as root (before switching user)
+# Install Playwright and browsers as root
 RUN pip install --no-cache-dir playwright && \
     python -m playwright install --with-deps chromium
 
 # Copy the rest of the code
 COPY . .
 
-# Set permissions and switch to non-root user
-RUN chown -R appuser:appuser /app
+# Set permissions for appuser and browser cache
+RUN chown -R appuser:appuser /app /ms-playwright
 USER appuser
 
-# Default command (can be overridden by docker-compose)
 CMD ["python", "flask_app/app.py"] 

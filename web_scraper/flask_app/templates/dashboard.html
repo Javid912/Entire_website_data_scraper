@@ -25,7 +25,7 @@
             <option value="csv">CSV</option>
         </select>
     </div>
-    <button type="submit" class="btn btn-primary">Start Scraping</button>
+    <button type="submit" class="btn btn-primary" id="scrape-btn">Start Scraping</button>
 </form>
 <div id="status" class="my-3">
     <p class="fw-bold">Status: <span id="scrape-status">{{ status if status else 'Idle' }}</span></p>
@@ -65,4 +65,13 @@
 <h3>Download Results</h3>
 <a href="/download/json" class="btn btn-success">Download JSON</a>
 <a href="/download/csv" class="btn btn-info">Download CSV</a>
+{% endblock %}
+
+{% block scripts %}
+<script>
+document.getElementById('scrape-form').addEventListener('submit', function(e) {
+    document.getElementById('scrape-status').innerText = 'Scraping in progress...';
+    document.getElementById('scrape-btn').disabled = true;
+});
+</script>
 {% endblock %} 
